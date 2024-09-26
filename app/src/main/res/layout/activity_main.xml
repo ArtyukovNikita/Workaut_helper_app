@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Шапка -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary">
+
+        <!-- Кнопка меню -->
+        <ImageButton
+            android:id="@+id/menu_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="@string/menu" />
+
+        <!-- Пробел между кнопками -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- Кнопка календаря -->
+        <ImageButton
+            android:id="@+id/calendar_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_calendar"
+            android:contentDescription="@string/calendar" />
+    </LinearLayout>
+
+    <!-- Основное содержимое -->
+    <TextView
+        android:id="@+id/hello_world"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Workout for today"
+        android:layout_below="@id/header"
+        android:layout_centerHorizontal="true"/>
+</RelativeLayout>
