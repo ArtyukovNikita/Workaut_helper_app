@@ -12,7 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/gradient_background"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:minHeight="10dp"
+        android:layout_margin="0dp">
 
         <!-- Кнопка меню -->
 
@@ -20,11 +22,29 @@
 
         <ImageButton
             android:id="@+id/menu_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/menu"
+            android:src="@drawable/ic_menu"
+            android:background="@android:color/transparent" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- Заголовок -->
+        <TextView
+            android:id="@+id/hello_world"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/menu"
-            android:src="@drawable/ic_menu" />
+            android:text="Today"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"
+            android:layout_marginHorizontal="16dp"
+            android:textSize="30sp"/>  <!-- Отступы по горизонтали для красоты -->
 
+        <!-- Пробел между кнопками -->
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -33,17 +53,10 @@
         <!-- Кнопка календаря -->
         <ImageButton
             android:id="@+id/calendar_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@string/calendar"
-            android:src="@drawable/ic_calendar" />
+            android:src="@drawable/ic_calendar"
+            android:background="@android:color/transparent" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Workout for today"
-        android:layout_below="@id/header"
-        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
