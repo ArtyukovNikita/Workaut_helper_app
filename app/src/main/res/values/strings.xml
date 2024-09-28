@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Workaut Helper</string>
-    <string name="menu">Описание меню</string> <!-- Добавь эту строку -->
+    <string name="menu">Описание меню</string>
     <string name="calendar">Календарь</string>
+    <string name="Today">Workout for today</string>
 
 </resources>
