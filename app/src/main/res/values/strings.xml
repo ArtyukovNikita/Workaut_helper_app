@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Workaut Helper</string>
+    <string name="menu">Описание меню</string> <!-- Добавь эту строку -->
+    <string name="calendar">Календарь</string>
+
 </resources>

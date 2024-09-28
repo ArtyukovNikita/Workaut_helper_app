@@ -4,22 +4,27 @@
     android:layout_height="match_parent">
 
     <!-- Шапка -->
+
+    <!-- Основное содержимое -->
+
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimary">
+        android:background="@drawable/gradient_background"
+        android:orientation="horizontal">
 
         <!-- Кнопка меню -->
+
+        <!-- Пробел между кнопками -->
+
         <ImageButton
             android:id="@+id/menu_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_menu"
-            android:contentDescription="@string/menu" />
+            android:contentDescription="@string/menu"
+            android:src="@drawable/ic_menu" />
 
-        <!-- Пробел между кнопками -->
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -30,11 +35,10 @@
             android:id="@+id/calendar_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_calendar"
-            android:contentDescription="@string/calendar" />
+            android:contentDescription="@string/calendar"
+            android:src="@drawable/ic_calendar" />
     </LinearLayout>
 
-    <!-- Основное содержимое -->
     <TextView
         android:id="@+id/hello_world"
         android:layout_width="wrap_content"
