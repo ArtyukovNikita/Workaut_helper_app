@@ -3,5 +3,7 @@
     <string name="menu">Описание меню</string>
     <string name="calendar">Календарь</string>
     <string name="Today">Workout for today</string>
+    <string name="navigation_drawer_open">Открыть меню</string>
+    <string name="navigation_drawer_close">Закрыть меню</string>
 
 </resources>
