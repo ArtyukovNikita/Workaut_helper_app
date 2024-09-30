@@ -66,6 +66,16 @@
     </LinearLayout>
     <!-- Другие элементы макета могут идти здесь -->
 
+    <Button
+        android:id="@+id/btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/baseline_add_box_24"
+        android:contentDescription="Добавить" />
+
 </RelativeLayout>
 
 <com.google.android.material.navigation.NavigationView
