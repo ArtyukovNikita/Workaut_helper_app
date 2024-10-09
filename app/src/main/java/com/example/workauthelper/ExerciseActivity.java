@@ -1,37 +1,43 @@
 package com.example.workauthelper;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class ExerciseActivity extends AppCompatActivity {
 
     private ListView listView;
-    private String[] exercises;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
+        // Инициализация элементов интерфейса
         listView = findViewById(R.id.exercise_list_view);
-        String category = getIntent().getStringExtra("category");
+        TextView title = findViewById(R.id.activity_title);
+        Button addButton = findViewById(R.id.add_button);
+        Button searchButton = findViewById(R.id.search_button);
 
-        switch (category) {
-            case "Спина":
-                exercises = new String[]{"Становая тяга"};
-                break;
-            case "Ноги":
-                exercises = new String[]{"Приседания"};
-                break;
-            case "Грудь":
-                exercises = new String[]{"Жим лежа"};
-                break;
-        }
+        // Установка названия активности
+        title.setText("Упражнения");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, exercises);
-        listView.setAdapter(adapter);
+        // Обработка нажатий на кнопки
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Код для добавления нового упражнения
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Код для поиска упражнения
+            }
+        });
     }
 }

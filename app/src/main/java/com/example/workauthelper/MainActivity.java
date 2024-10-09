@@ -72,8 +72,12 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.menu_exercises) {
-                Intent intent = new Intent(this, CategoryActivity.class);
-                startActivity(intent);
+                try {
+                    Intent intent = new Intent(this, CategoryActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace(); // Выводим ошибку в Logcat
+                }
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
