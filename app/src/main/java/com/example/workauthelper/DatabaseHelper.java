@@ -1,8 +1,11 @@
 package com.example.workauthelper;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -71,5 +74,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         onCreate(db);
+    }
+
+    public void addExercise(String name, String image, int categoryId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EXERCISE_NAME, name);
+        values.put(COLUMN_EXERCISE_IMAGE, image);
+        values.put(COLUMN_EXERCISE_CATEGORY_ID, categoryId); // Добавляем ID категории
+
+        db.insert(TABLE_EXERCISES, null, values);
+        db.close();
+    }
+
+    public ArrayList<Exercise> getAllExercises() {
+        ArrayList<Exercise> exerciseList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_EXERCISES, null);
+        if (cursor.moveToFirst()) {
+            do {
+                // Получаем индексы столбцов
+                int nameIndex = cursor.getColumnIndex(COLUMN_EXERCISE_NAME);
+                int imageIndex = cursor.getColumnIndex(COLUMN_EXERCISE_IMAGE);
+
+                // Проверяем, что индексы действительны
+                if (nameIndex != -1 && imageIndex != -1) {
+                    String name = cursor.getString(nameIndex);
+                    String image = cursor.getString(imageIndex);
+                    exerciseList.add(new Exercise(name, image)); // Создаем объект Exercise и добавляем его в список
+                } else {
+                    // Обработка ошибки: один из столбцов не найден
+                    // Например, можно вывести сообщение в лог или игнорировать эту запись
+                    System.err.println("Ошибка: один из столбцов не найден в таблице упражнений.");
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return exerciseList;
     }
 }

@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
-
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,11 +39,24 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
 
         // Устанавливаем данные в элементы
         exerciseName.setText(exercise.getName());
-        exerciseIcon.setImageResource(exercise.getIconResourceId());
+        exerciseIcon.setImageResource(exercise.getIconResourceId()); // Убедитесь, что метод getIconResourceId() реализован в классе Exercise
 
         // Обработчик нажатия на кнопку меню
         popupMenuButton.setOnClickListener(v -> {
-            // Здесь вы можете реализовать popup меню
+            PopupMenu popupMenu = new PopupMenu(getContext(), v);
+            popupMenu.getMenuInflater().inflate(R.menu.exercise_popup_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.edit_exercise) {
+                    // Логика для редактирования упражнения
+                    return true;
+                } else if (item.getItemId() == R.id.delete_exercise) {
+                    // Логика для удаления упражнения
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+            popupMenu.show();
         });
 
         return convertView;
