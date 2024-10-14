@@ -48,9 +48,12 @@ public class CategoryActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Код для добавления новой категории
+                // Вы можете создать аналогичный диалог для добавления категории
+                AddExerciseDialog dialog = new AddExerciseDialog(CategoryActivity.this);
+                dialog.show(); // Показать диалог
             }
         });
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override

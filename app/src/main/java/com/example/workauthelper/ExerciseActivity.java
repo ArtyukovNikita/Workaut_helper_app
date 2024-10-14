@@ -36,14 +36,15 @@ public class ExerciseActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Код для добавления новой категории
+                AddExerciseDialog dialog = new AddExerciseDialog(ExerciseActivity.this);
+                dialog.show(); // Показать диалог
             }
         });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Код для поиска категории
+                // Код для поиска активности
             }
         });
 

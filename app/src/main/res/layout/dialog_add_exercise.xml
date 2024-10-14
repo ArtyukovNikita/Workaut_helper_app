@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white"> <!-- Установите фон для диалога -->
+
+    <!-- Заголовок диалогового окна -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Редактирование упражнения"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" /> <!-- Отступ снизу для разделения -->
+
+    <!-- Контейнер для изображения и названия -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp"> <!-- Отступ снизу для разделения -->
+
+        <!-- Изображение упражнения -->
+        <ImageView
+            android:id="@+id/edit_exercise_image"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="Изображение упражнения"
+            android:layout_marginEnd="16dp" />
+
+        <!-- Название упражнения -->
+        <EditText
+            android:id="@+id/edit_exercise_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Название упражнения"
+            android:minHeight="48dp"
+            android:padding="12dp" />
+        <!-- Поле для выбора категории -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"> <!-- Отступ снизу для разделения -->
+
+        <!-- Spinner для выбора категории -->
+        <Spinner
+            android:id="@+id/category_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end" /> <!-- Выравнивание вправо -->
+    </LinearLayout>
+
+    <!-- Контейнер для кнопок -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"> <!-- Выравнивание кнопок вправо -->
+
+        <!-- Кнопка "Отмена" -->
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Отмена"
+            android:layout_marginEnd="8dp" /> <!-- Отступ справа от кнопки -->
+
+        <!-- Кнопка "Добавить" -->
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить" />
+    </LinearLayout>
+</LinearLayout>

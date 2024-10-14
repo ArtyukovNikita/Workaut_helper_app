@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.material.navigation.NavigationView;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton calendarButton;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
+    private static final String PREFS_NAME = "MyPrefs";
+    private static final String KEY_IMAGES_LOADED = "images_loaded";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +85,23 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+
+        // Получаем экземпляр DatabaseHelper
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+        // Проверяем, были ли уже загружены изображения
+        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean imagesLoaded = preferences.getBoolean(KEY_IMAGES_LOADED, false);
+
+        if (!imagesLoaded) {
+            // Если изображения еще не загружены, загружаем их в базу данных
+            dbHelper.loadVectorImagesIntoDatabase(this);
+
+            // Устанавливаем флаг, что изображения были загружены
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(KEY_IMAGES_LOADED, true);
+            editor.apply();
+        }
     }
 
     @Override
