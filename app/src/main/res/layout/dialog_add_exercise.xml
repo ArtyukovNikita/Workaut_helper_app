@@ -51,8 +51,8 @@
         <!-- Spinner для выбора категории -->
         <Spinner
             android:id="@+id/category_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
             android:layout_gravity="end" /> <!-- Выравнивание вправо -->
     </LinearLayout>
 
