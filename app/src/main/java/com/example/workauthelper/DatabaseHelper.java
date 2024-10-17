@@ -182,6 +182,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return categories;
     }
+
+    public List<Exercise> getAllExercises() {
+        List<Exercise> exercises = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_EXERCISES,
+                new String[]{COLUMN_EXERCISE_NAME, COLUMN_EXERCISE_IMAGE},
+                null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String exerciseName = cursor.getString(0); // Получаем название упражнения
+                int exerciseImage = cursor.getInt(1); // Получаем изображение упражнения exercises.add(new Exercise(exerciseName, exerciseImage)); // Добавляем в список
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return exercises;
+    }
+
     public void addCategory(String categoryName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -189,13 +210,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_CATEGORIES, null, values);
         db.close();
     }
-    public void addExercise(String exerciseName, String category) {
+    public void addExercise(String exerciseName, int categoryId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_EXERCISE_NAME, exerciseName);
-        values.put(COLUMN_EXERCISE_CATEGORY_ID, category);
+        values.put(COLUMN_EXERCISE_CATEGORY_ID, categoryId); // Используйте ID категории
         db.insert(TABLE_EXERCISES, null, values);
         db.close();
     }
+
 
 }

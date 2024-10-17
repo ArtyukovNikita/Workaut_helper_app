@@ -41,18 +41,17 @@ public class AddExerciseDialog {
 
         addButton.setOnClickListener(v -> {
             String exerciseName = exerciseNameEditText.getText().toString();
-            String selectedCategory = categorySpinner.getSelectedItem().toString();
+            int selectedCategoryId = categorySpinner.getSelectedItemPosition(); // Получите ID категории по позиции
 
             // Проверка, что имя упражнения не пустое
             if (!exerciseName.isEmpty()) {
-
-                dbHelper.addExercise(exerciseName, selectedCategory); // Добавляем упражнение в базу данных
+                dbHelper.addExercise(exerciseName, selectedCategoryId); // Добавляем упражнение в базу данных
                 dialog.dismiss(); // Закрыть диалог
             } else {
-                // Вы можете добавить уведомление для пользователя, что имя упражнения не может быть пустым
                 Toast.makeText(context, "Введите название упражнения", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Обработчик нажатия на изображение
         exerciseImageView.setOnClickListener(v -> openImageSelectionDialog(context));
@@ -70,4 +69,6 @@ public class AddExerciseDialog {
     public void show() {
         dialog.show();
     }
+
 }
+
