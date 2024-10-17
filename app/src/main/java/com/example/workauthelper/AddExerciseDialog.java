@@ -13,11 +13,11 @@ import android.widget.Toast;
 import java.util.List;
 
 public class AddExerciseDialog {
-
     private Dialog dialog;
     private EditText exerciseNameEditText;
     private ImageView exerciseImageView;
     private Spinner categorySpinner;
+    private int selectedImageResourceId; // Объявляем переменную
 
     public AddExerciseDialog(Context context) {
         dialog = new Dialog(context);
@@ -27,9 +27,8 @@ public class AddExerciseDialog {
         categorySpinner = dialog.findViewById(R.id.category_spinner);
 
         DatabaseHelper dbHelper = new DatabaseHelper(context);
-        List<String> categories = dbHelper.getAllCategories(); // Получаем категории из базы данных
+        List<String> categories = dbHelper.getAllCategories();
 
-        // Установка адаптера для Spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
@@ -37,28 +36,30 @@ public class AddExerciseDialog {
         Button cancelButton = dialog.findViewById(R.id.cancel_button);
         Button addButton = dialog.findViewById(R.id.add_button);
 
-        cancelButton.setOnClickListener(v -> dialog.dismiss()); // Закрыть диалог
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
 
         addButton.setOnClickListener(v -> {
             String exerciseName = exerciseNameEditText.getText().toString();
-            int selectedCategoryId = categorySpinner.getSelectedItemPosition(); // Получите ID категории по позиции
+            int selectedCategoryId = categorySpinner.getSelectedItemPosition();
 
-            // Проверка, что имя упражнения не пустое
+            // Используйте selectedImageResourceId здесь
             if (!exerciseName.isEmpty()) {
-                dbHelper.addExercise(exerciseName, selectedCategoryId); // Добавляем упражнение в базу данных
-                dialog.dismiss(); // Закрыть диалог
+                dbHelper.addExercise(exerciseName, selectedImageResourceId, selectedCategoryId);
+                dialog.dismiss();
             } else {
                 Toast.makeText(context, "Введите название упражнения", Toast.LENGTH_SHORT).show();
             }
         });
 
-
-        // Обработчик нажатия на изображение
         exerciseImageView.setOnClickListener(v -> openImageSelectionDialog(context));
     }
 
     private void openImageSelectionDialog(Context context) {
         ImageSelectionDialog imageSelectionDialog = new ImageSelectionDialog(context, this);
+        imageSelectionDialog.setOnImageSelectedListener(resourceId -> {
+            setExerciseImage(resourceId);
+            this.selectedImageResourceId = resourceId; // Сохраняем выбранный идентификатор изображения
+        });
         imageSelectionDialog.show();
     }
 
@@ -69,6 +70,6 @@ public class AddExerciseDialog {
     public void show() {
         dialog.show();
     }
-
 }
+
 

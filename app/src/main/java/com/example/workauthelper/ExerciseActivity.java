@@ -18,7 +18,8 @@ public class ExerciseActivity extends AppCompatActivity {
     private ArrayList<Exercise> exercises;
     private ExerciseAdapter adapter;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
@@ -34,14 +35,16 @@ public class ExerciseActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         addButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 AddExerciseDialog dialog = new AddExerciseDialog(ExerciseActivity.this);
                 dialog.show();
             }
         });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
                 // Код для поиска активности
             }
         });
@@ -49,9 +52,11 @@ public class ExerciseActivity extends AppCompatActivity {
 
     private void loadExercisesFromDatabase() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        List<Exercise> dbExercises = dbHelper.getAllExercises();
+        List<Exercise> dbExercises = dbHelper.getAllExercises(); // Получаем все упражнения из базы данных
+        exercises.clear();
+        // Очищаем список перед добавлением новых данных
         if (dbExercises != null) {
-            exercises.addAll(dbExercises);
+            exercises.addAll(dbExercises); // Добавляем все упражнения в список
         }
     }
 }

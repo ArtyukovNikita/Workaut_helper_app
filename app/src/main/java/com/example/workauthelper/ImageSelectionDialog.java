@@ -18,6 +18,7 @@ public class ImageSelectionDialog {
     private List<Integer> imagePaths; // Список путей к изображениям
     private AddExerciseDialog addExerciseDialog;
 
+
     public ImageSelectionDialog(Context context, AddExerciseDialog addExerciseDialog) {
         this.addExerciseDialog = addExerciseDialog;
         dialog = new Dialog(context);
@@ -53,6 +54,25 @@ public class ImageSelectionDialog {
         });
 
     }
+
+    public interface OnImageSelectedListener {
+        void onImageSelected(int resourceId);
+    }
+
+
+    private OnImageSelectedListener listener;
+
+    public void setOnImageSelectedListener(OnImageSelectedListener listener) {
+        this.listener = listener;
+    }
+
+    // Вызовите этот метод, когда изображение будет выбрано
+    private void notifyImageSelected(int resourceId) {
+        if (listener != null) {
+            listener.onImageSelected(resourceId);
+        }
+    }
+
 
     public void show() {
         dialog.show();
