@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -170,10 +171,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<String> categories = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_CATEGORIES, new String[]{COLUMN_CATEGORY_NAME}, null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CATEGORIES, new String[]{COLUMN_CATEGORY_ID, COLUMN_CATEGORY_NAME}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                String categoryName = cursor.getString(0); // Получаем название категории
+                int categoryId = cursor.getInt(0); // Получаем ID категории
+                String categoryName = cursor.getString(1); // Получаем название категории
+                Log.d("DatabaseHelper", "Category ID: " + categoryId + ", Name: " + categoryName);
                 categories.add(categoryName); // Добавляем название в список
             } while (cursor.moveToNext());
         }
@@ -182,6 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return categories;
     }
+
 
     public List<Exercise> getAllExercises() {
         List<Exercise> exercises = new ArrayList<>();

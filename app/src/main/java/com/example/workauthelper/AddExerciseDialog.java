@@ -2,6 +2,7 @@ package com.example.workauthelper;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,16 +41,20 @@ public class AddExerciseDialog {
 
         addButton.setOnClickListener(v -> {
             String exerciseName = exerciseNameEditText.getText().toString();
-            int selectedCategoryId = categorySpinner.getSelectedItemPosition();
+            int selectedCategoryId = categorySpinner.getSelectedItemPosition() + 1; // Корректируем, если нужно
 
-            // Используйте selectedImageResourceId здесь
-            if (!exerciseName.isEmpty()) {
-                dbHelper.addExercise(exerciseName, selectedImageResourceId, selectedCategoryId);
+            Log.d("AddExerciseDialog", "Exercise Name: " + exerciseName);
+            Log.d("AddExerciseDialog", "Selected Image Resource ID: " + selectedImageResourceId);
+            Log.d("AddExerciseDialog", "Selected Category ID: " + selectedCategoryId);
+
+            if (!exerciseName.isEmpty() && selectedImageResourceId != 0) {
+                dbHelper.addExercise(exerciseName, selectedCategoryId, selectedImageResourceId);
                 dialog.dismiss();
             } else {
-                Toast.makeText(context, "Введите название упражнения", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Введите название упражнения и выберите изображение", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         exerciseImageView.setOnClickListener(v -> openImageSelectionDialog(context));
     }
@@ -59,6 +64,7 @@ public class AddExerciseDialog {
         imageSelectionDialog.setOnImageSelectedListener(resourceId -> {
             setExerciseImage(resourceId);
             this.selectedImageResourceId = resourceId; // Сохраняем выбранный идентификатор изображения
+            Log.d("AddExerciseDialog", "Image Selected Resource ID: " + selectedImageResourceId); // Логируем выбранный ID
         });
         imageSelectionDialog.show();
     }

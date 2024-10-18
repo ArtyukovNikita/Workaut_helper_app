@@ -13,57 +13,49 @@ import android.widget.GridView;
 import java.util.List;
 
 public class ImageSelectionDialog {
-
     private Dialog dialog;
     private List<Integer> imagePaths; // Список путей к изображениям
     private AddExerciseDialog addExerciseDialog;
 
-
+    public interface OnImageSelectedListener {
+        void onImageSelected(int resourceId);
+    }
     public ImageSelectionDialog(Context context, AddExerciseDialog addExerciseDialog) {
         this.addExerciseDialog = addExerciseDialog;
         dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_image_selection); // Создайте соответствующий layout для диалога выбора изображений
+        dialog.setContentView(R.layout.dialog_image_selection);
 
-        GridView gridView = dialog.findViewById(R.id.image_grid_view); // Изменяем ListView на GridView
 
-        // Получаем изображения из базы данных
+        GridView gridView = dialog.findViewById(R.id.image_grid_view);
         DatabaseHelper dbHelper = new DatabaseHelper(context);
-        imagePaths = dbHelper.getAllVectorImages(); // Метод, который возвращает список идентификаторов изображений
+        imagePaths = dbHelper.getAllVectorImages();
 
-        // Создаем адаптер для отображения изображений
         ImageAdapter imageAdapter = new ImageAdapter(context, imagePaths);
         gridView.setAdapter(imageAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Получаем выбранное изображение
                 int selectedImagePath = imagePaths.get(position);
-                // Устанавливаем изображение в AddExerciseDialog
-                addExerciseDialog.setExerciseImage(selectedImagePath); // Преобразуем путь к ресурсу
+                if (listener != null) {
+                    listener.onImageSelected(selectedImagePath); // Уведомляем слушателя
+                }
                 dialog.dismiss();
             }
         });
-        // Внутри конструктора ImageSelectionDialog
+
         Button closeButton = dialog.findViewById(R.id.close_button);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss(); // Закрыть диалог
-            }
-        });
-
+        closeButton.setOnClickListener(v -> dialog.dismiss());
     }
-
-    public interface OnImageSelectedListener {
-        void onImageSelected(int resourceId);
-    }
-
 
     private OnImageSelectedListener listener;
 
     public void setOnImageSelectedListener(OnImageSelectedListener listener) {
         this.listener = listener;
+    }
+
+    public void show() {
+        dialog.show();
     }
 
     // Вызовите этот метод, когда изображение будет выбрано
@@ -72,9 +64,5 @@ public class ImageSelectionDialog {
             listener.onImageSelected(resourceId);
         }
     }
-
-
-    public void show() {
-        dialog.show();
-    }
 }
+
