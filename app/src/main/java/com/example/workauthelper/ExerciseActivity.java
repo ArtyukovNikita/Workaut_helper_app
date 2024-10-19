@@ -27,36 +27,35 @@ public class ExerciseActivity extends AppCompatActivity {
         TextView title = findViewById(R.id.activity_title);
         addButton = findViewById(R.id.add_button);
         searchButton = findViewById(R.id.search_button);
-        title.setText("Упражнения");
+
+        // Получаем ID категории из интента
+        int categoryId = getIntent().getIntExtra("category_id", -1);
+        String categoryName = getIntent().getStringExtra("category_name");
+        title.setText(categoryName);
 
         exercises = new ArrayList<>();
-        loadExercisesFromDatabase();
+        loadExercisesFromDatabase(categoryId); // Загружаем упражнения для конкретной категории
         adapter = new ExerciseAdapter(this, exercises);
         listView.setAdapter(adapter);
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddExerciseDialog dialog = new AddExerciseDialog(ExerciseActivity.this);
-                dialog.show();
-            }
+        addButton.setOnClickListener(v -> {
+            AddExerciseDialog dialog = new AddExerciseDialog(ExerciseActivity.this);
+            dialog.show();
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Код для поиска активности
-            }
+        searchButton.setOnClickListener(v -> {
+            // Код для поиска упражнений
         });
     }
 
-    private void loadExercisesFromDatabase() {
+
+    private void loadExercisesFromDatabase(int categoryId) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        List<Exercise> dbExercises = dbHelper.getAllExercises(); // Получаем все упражнения из базы данных
+        List<Exercise> dbExercises = dbHelper.getExercisesByCategory(categoryId); // Получаем упражнения по категории
         exercises.clear();
-        // Очищаем список перед добавлением новых данных
         if (dbExercises != null) {
-            exercises.addAll(dbExercises); // Добавляем все упражнения в список
+            exercises.addAll(dbExercises);
         }
     }
+
 }

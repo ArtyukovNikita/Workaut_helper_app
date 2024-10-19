@@ -1,9 +1,12 @@
 package com.example.workauthelper;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +15,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.navigation.NavigationView;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle toggle;
     private static final String PREFS_NAME = "MyPrefs";
     private static final String KEY_IMAGES_LOADED = "images_loaded";
+    private View calendarLayout;
+    private boolean isCalendarVisible = false;
+    private CustomSwipeRefreshLayout swipeRefreshLayout; // Используем кастомный SwipeRefreshLayout
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,23 +46,11 @@ public class MainActivity extends AppCompatActivity {
         calendarButton = findViewById(R.id.calendar_button);
 
         // Обработчик нажатия на кнопку меню
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Открытие бокового меню
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.START);
-                }
-            }
-        });
-
-        // Обработчик нажатия на кнопку календаря
-        calendarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Здесь будет код для открытия календаря
+        menuButton.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
 
@@ -75,14 +70,10 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.menu_exercises) {
-                try {
-                    Intent intent = new Intent(this, CategoryActivity.class);
-                    startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace(); // Выводим ошибку в Logcat
-                }
+                Intent intent = new Intent(this, CategoryActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
             }
-            drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
@@ -94,14 +85,40 @@ public class MainActivity extends AppCompatActivity {
         boolean imagesLoaded = preferences.getBoolean(KEY_IMAGES_LOADED, false);
 
         if (!imagesLoaded) {
-            // Если изображения еще не загружены, загружаем их в базу данных
             dbHelper.loadVectorImagesIntoDatabase(this);
-
-            // Устанавливаем флаг, что изображения были загружены
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(KEY_IMAGES_LOADED, true);
             editor.apply();
         }
+
+        // Инициализация макета календаря
+        calendarLayout = getLayoutInflater().inflate(R.layout.calendar_layout, null);
+        calendarLayout.setVisibility(View.GONE); // Изначально скрыт
+
+        // Установка обработчика для кнопки календаря
+        calendarButton.setOnClickListener(v -> toggleCalendar());
+
+        // Установка обработчика для кнопки закрытия календаря
+        Button closeButton = calendarLayout.findViewById(R.id.btn_close_calendar);
+        closeButton.setOnClickListener(v -> closeCalendar());
+
+        // Добавление макета календаря в основной макет
+        ((RelativeLayout) findViewById(R.id.main_content)).addView(calendarLayout);
+
+        // Настройка сетки календаря
+        setupCalendar();
+
+        // Инициализация кастомного SwipeRefreshLayout
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setDrawerLayout(drawerLayout); // Установка DrawerLayout
+
+        // Установка слушателя для SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (!isCalendarVisible) {
+                openCalendar();
+            }
+            swipeRefreshLayout.setRefreshing(false); // Остановить анимацию
+        });
     }
 
     @Override
@@ -110,6 +127,41 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void toggleCalendar() {
+        if (isCalendarVisible) {
+            closeCalendar();
+        } else {
+            openCalendar();
+        }
+    }
+
+    private void openCalendar() {
+        calendarLayout.setVisibility(View.VISIBLE);
+        isCalendarVisible = true;
+    }
+
+    private void closeCalendar() {
+        calendarLayout.setVisibility(View.GONE);
+        isCalendarVisible = false;
+    }
+
+    private void setupCalendar() {
+        GridLayout calendarGrid = calendarLayout.findViewById(R.id.calendar_grid);
+        calendarGrid.removeAllViews();
+
+        // Заполнение сетки днями месяца
+        for (int i = 1; i <= 30; i++) { // Упрощенно для 30 дней
+            final int day = i; // Создаем финальную переменную
+            Button dayButton = new Button(this);
+            dayButton.setText(String.valueOf(day));
+            dayButton.setOnClickListener(v -> {
+                // Обработка нажатия на день
+                Toast.makeText(this, "Выбран день: " + day, Toast.LENGTH_SHORT).show();
+            });
+            calendarGrid.addView(dayButton);
         }
     }
 }

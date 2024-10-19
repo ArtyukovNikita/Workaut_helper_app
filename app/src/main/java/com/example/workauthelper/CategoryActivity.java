@@ -44,10 +44,13 @@ public class CategoryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(CategoryActivity.this, ExerciseActivity.class);
-                intent.putExtra("category", categories.get(position));
+                intent.putExtra("category_id", position + 1); // Предполагаем, что ID начинаются с 1
+                intent.putExtra("category_name", categories.get(position));
                 startActivity(intent);
             }
         });
+
+
 
         // Обработка нажатий на иконку добавления
         addButton.setOnClickListener(new View.OnClickListener() {
