@@ -49,9 +49,8 @@
                     android:textColor="@android:color/white"
                     android:layout_gravity="center_vertical"
                     android:layout_marginHorizontal="16dp"
-                    android:textSize="30sp"/>  <!-- Отступы по горизонтали для красоты -->
+                    android:textSize="30sp"/>
 
-                <!-- Пробел между кнопками -->
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -67,7 +66,13 @@
                     android:background="@android:color/transparent" />
             </LinearLayout>
 
-            <!-- Другие элементы макета могут идти здесь -->
+            <!-- Включение календаря -->
+            <include
+                layout="@layout/calendar_layout"
+                android:id="@+id/calendar_layout"
+                android:visibility="gone" /> <!-- Скрываем по умолчанию -->
+
+            <!-- Кнопка добавления -->
             <ImageButton
                 android:id="@+id/btn_add"
                 android:layout_width="100dp"
