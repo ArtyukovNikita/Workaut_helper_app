@@ -1,13 +1,17 @@
 package com.example.workauthelper;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,10 +20,8 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.google.android.material.navigation.NavigationView;
-import android.content.Intent;
-import android.content.SharedPreferences;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,8 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_IMAGES_LOADED = "images_loaded";
     private View calendarLayout;
     private boolean isCalendarVisible = false;
-    private CustomSwipeRefreshLayout swipeRefreshLayout; // Используем кастомный SwipeRefreshLayout
-    private Calendar currentCalendar; // Текущий календарь
+    private Calendar currentCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,23 +87,26 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // Получаем экземпляр DatabaseHelper
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-
         // Проверяем, были ли уже загружены изображения
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean imagesLoaded = preferences.getBoolean(KEY_IMAGES_LOADED, false);
-
         if (!imagesLoaded) {
+            DatabaseHelper dbHelper = new DatabaseHelper(this);
             dbHelper.loadVectorImagesIntoDatabase(this);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean(KEY_IMAGES_LOADED, true);
-            editor.apply();
+            preferences.edit().putBoolean(KEY_IMAGES_LOADED, true).apply();
         }
 
         // Инициализация макета календаря
         calendarLayout = getLayoutInflater().inflate(R.layout.calendar_layout, null);
         calendarLayout.setVisibility(View.GONE); // Изначально скрыт
+
+        // Удаляем calendarLayout из его родителя, если он уже добавлен
+        if (calendarLayout.getParent() != null) {
+            ((ViewGroup) calendarLayout.getParent()).removeView(calendarLayout);
+        }
+
+        // Добавление макета календаря в основной макет
+        ((RelativeLayout) findViewById(R.id.main_content)).addView(calendarLayout);
 
         // Установка обработчика для кнопки календаря
         calendarButton.setOnClickListener(v -> toggleCalendar());
@@ -111,15 +115,12 @@ public class MainActivity extends AppCompatActivity {
         Button closeButton = calendarLayout.findViewById(R.id.btn_close_calendar);
         closeButton.setOnClickListener(v -> closeCalendar());
 
-        // Добавление макета календаря в основной макет
-        ((RelativeLayout) findViewById(R.id.main_content)).addView(calendarLayout);
-
         // Установка заголовка календаря
         updateCalendarTitle();
 
         // Установка обработчиков для кнопок переключения месяцев
-        ImageButton previousButton = calendarLayout.findViewById(R.id.btn_previous); // Измените на ImageButton
-        ImageButton nextButton = calendarLayout.findViewById(R.id.btn_next); // Измените на ImageButton
+        ImageButton previousButton = calendarLayout.findViewById(R.id.btn_previous);
+        ImageButton nextButton = calendarLayout.findViewById(R.id.btn_next);
 
         previousButton.setOnClickListener(v -> {
             currentCalendar.add(Calendar.MONTH, -1); // Переход на предыдущий месяц
@@ -133,21 +134,10 @@ public class MainActivity extends AppCompatActivity {
             updateCalendarTitle(); // Обновление заголовка
         });
 
-        // Инициализация кастомного SwipeRefreshLayout
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setDrawerLayout(drawerLayout); // Установка DrawerLayout
-
-        // Установка слушателя для SwipeRefreshLayout
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            if (!isCalendarVisible) {
-                openCalendar();
-            }
-            swipeRefreshLayout.setRefreshing(false); // Остановить анимацию
-        });
-
-        // Настройка сетки календаря
+        // Настройка календаря
         setupCalendar();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -167,13 +157,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openCalendar() {
-        calendarLayout.setVisibility(View.VISIBLE);
-        isCalendarVisible = true;
+        calendarLayout.setVisibility(View.VISIBLE); // Показываем календарь
+        calendarLayout.setTranslationY(-calendarLayout.getHeight()); // Начальная позиция для анимации
+        calendarLayout.animate()
+                .translationY(0)
+                .setDuration(300)
+                .start();
+        isCalendarVisible = true; // Устанавливаем флаг видимости
     }
 
     private void closeCalendar() {
-        calendarLayout.setVisibility(View.GONE);
-        isCalendarVisible = false;
+        calendarLayout.animate()
+                .translationY(-calendarLayout.getHeight()) // Сдвигаем календарь вверх
+                .setDuration(300) // Длительность анимации
+                .withEndAction(() -> calendarLayout.setVisibility(View.GONE)) // Скрываем после анимации
+                .start();
+        isCalendarVisible = false; // Устанавливаем флаг видимости
     }
 
     private void updateCalendarTitle() {
@@ -184,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupCalendar() {
         GridLayout calendarGrid = calendarLayout.findViewById(R.id.calendar_grid);
-        calendarGrid.removeAllViews();
+        calendarGrid.removeAllViews(); // Очищаем предыдущие дни
 
         // Получаем количество дней в текущем месяце
         int daysInMonth = currentCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -240,8 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Выбран день: " + dayOfMonth + " " + (currentCalendar.get(Calendar.MONTH) + 1) + "/" + currentCalendar.get(Calendar.YEAR), Toast.LENGTH_SHORT).show();
             });
 
-            calendarGrid.addView(dayButton);
+            calendarGrid.addView(dayButton); // Добавляем кнопку дня в сетку
         }
     }
-
 }
