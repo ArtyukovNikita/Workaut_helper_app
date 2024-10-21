@@ -1,17 +1,20 @@
 package com.example.workauthelper;
 
+import com.example.workauthelper.R;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
-
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.MenuRes;
 
 import java.util.List;
 
@@ -20,6 +23,7 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
     public ExerciseAdapter(@NonNull Context context, List<Exercise> exercises) {
         super(context, 0, exercises);
     }
+
 
     @NonNull
     @Override
@@ -43,9 +47,40 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
 
         // Обработчик нажатия на кнопку меню
         popupMenuButton.setOnClickListener(v -> {
-            // Здесь вы можете реализовать popup меню
+            showPopupMenu(v, exercise); // Передаем представление и упражнение
         });
 
         return convertView;
+    }
+
+    private void showPopupMenu(View view, Exercise exercise) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.exercise_popup_menu, popupMenu.getMenu()); // Убедитесь, что R.menu правильный
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.edit_ex:
+                    editExercise(exercise);
+                    return true;
+                case R.id.delete_ex:
+                    deleteExercise(exercise);
+                    return true;
+                default:
+                    return false;
+            }
+        });
+
+        popupMenu.show();
+    }
+
+    private void editExercise(Exercise exercise) {
+        // Реализуйте логику редактирования упражнения
+        // Например, откройте диалог для редактирования
+    }
+
+    private void deleteExercise(Exercise exercise) {
+        // Реализуйте логику удаления упражнения
+        // Например, удалите его из базы данных и обновите список
     }
 }

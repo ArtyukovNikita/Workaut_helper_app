@@ -38,11 +38,18 @@ public class MainActivity extends AppCompatActivity {
     private View calendarLayout;
     private boolean isCalendarVisible = false;
     private Calendar currentCalendar;
+    private TextView headerTextView; // Добавьте эту строку
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Инициализация TextView заголовка
+        headerTextView = findViewById(R.id.hello_world); // Измените эту строку на ID вашего TextView
+        // Устанавливаем текущую дату в заголовке
+        updateHeaderWithCurrentDate();
+
 
         // Инициализация текущего календаря
         currentCalendar = Calendar.getInstance();
@@ -63,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+
 
         // Установка отступов для шапки
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.header), (v, insets) -> {
@@ -136,6 +144,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Настройка календаря
         setupCalendar();
+
+    }
+
+    private void updateHeaderWithCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MM/yyyy", Locale.getDefault());
+        String currentDate = sdf.format(calendar.getTime());
+        headerTextView.setText(currentDate + " (Today)"); // Добавляем "(Today)" к текущей дате
     }
 
 
@@ -190,22 +206,19 @@ public class MainActivity extends AppCompatActivity {
         currentCalendar.set(Calendar.DAY_OF_MONTH, 1); // Устанавливаем первый день месяца
 
         // Получаем день недели первого дня месяца
-        int firstDayOfWeek = currentCalendar.get(Calendar.DAY_OF_WEEK); // 1 = Воскресенье, 7 = Суббота
+        int firstDayOfWeek = currentCalendar.get(Calendar.DAY_OF_WEEK);
 
-        // Заполнение сетки пустыми кнопками до первого дня месяца
+        // Заполняем сетку пустыми кнопками до первого дня месяца
         for (int i = 1; i < firstDayOfWeek; i++) {
             Button emptyButton = new Button(this);
             emptyButton.setEnabled(false);
             GridLayout.LayoutParams params = new GridLayout.LayoutParams(
-                    GridLayout.spec(0), // Первая строка
-                    GridLayout.spec(i - 1) // Столбец
-            );
-            params.width = 80; // Фиксированная ширина кнопки в dp
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT; // Высота по содержимому
-            params.setMargins(1, 1, 1, 1); // Отступы между кнопками
-
+                    GridLayout.spec(0), GridLayout.spec(i - 1));
+            params.width = 80;
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.setMargins(1, 1, 1, 1);
             emptyButton.setLayoutParams(params);
-            emptyButton.setVisibility(View.INVISIBLE); // Скрываем кнопку
+            emptyButton.setVisibility(View.INVISIBLE);
             calendarGrid.addView(emptyButton);
         }
 
@@ -219,24 +232,21 @@ public class MainActivity extends AppCompatActivity {
             int row = (day + firstDayOfWeek - 2) / 7; // Установка строки
             int col = (day + firstDayOfWeek - 2) % 7; // Установка столбца
 
-            // Убедитесь, что вы не превышаете количество строк
             if (row >= 6) {
                 break; // Если уже 6 строк, выходим из цикла
             }
 
             GridLayout.LayoutParams params = new GridLayout.LayoutParams(
-                    GridLayout.spec(row), // Установка строки
-                    GridLayout.spec(col)  // Установка столбца
-            );
-
-            params.width = 80; // Фиксированная ширина кнопки в dp
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT; // Высота по содержимому
-            params.setMargins(1, 1, 1, 1); // Отступы между кнопками
-
+                    GridLayout.spec(row), GridLayout.spec(col));
+            params.width = 80;
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.setMargins(1, 1, 1, 1);
             dayButton.setLayoutParams(params);
             dayButton.setOnClickListener(v -> {
-                // Обработка нажатия на день
-                Toast.makeText(this, "Выбран день: " + dayOfMonth + " " + (currentCalendar.get(Calendar.MONTH) + 1) + "/" + currentCalendar.get(Calendar.YEAR), Toast.LENGTH_SHORT).show();
+                // Обработка нажатия на кнопку дня
+                String selectedDate = dayOfMonth + " " + (currentCalendar.get(Calendar.MONTH) + 1) + "/" + currentCalendar.get(Calendar.YEAR);
+                headerTextView.setText(selectedDate); // Обновляем заголовок с выбранной датой
+                Toast.makeText(this, "Выбран день: " + selectedDate, Toast.LENGTH_SHORT).show();
             });
 
             calendarGrid.addView(dayButton); // Добавляем кнопку дня в сетку

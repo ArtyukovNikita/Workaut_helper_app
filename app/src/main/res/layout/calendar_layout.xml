@@ -42,7 +42,7 @@
     <GridLayout
         android:id="@+id/calendar_grid"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:columnCount="7"
         android:rowCount="6"
         android:layout_margin="16dp"
