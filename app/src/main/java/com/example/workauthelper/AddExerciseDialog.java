@@ -19,7 +19,8 @@ public class AddExerciseDialog {
     private ImageView exerciseImageView;
     private Spinner categorySpinner;
     private int selectedImageResourceId; // Объявляем переменную
-
+    private Exercise exercise; // Добавьте это поле
+    // Конструктор для создания нового упражнения
     public AddExerciseDialog(Context context) {
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_add_exercise);
@@ -41,14 +42,15 @@ public class AddExerciseDialog {
 
         addButton.setOnClickListener(v -> {
             String exerciseName = exerciseNameEditText.getText().toString();
-            int selectedCategoryId = categorySpinner.getSelectedItemPosition() + 1; // Корректируем, если нужно
-
-            Log.d("AddExerciseDialog", "Exercise Name: " + exerciseName);
-            Log.d("AddExerciseDialog", "Selected Image Resource ID: " + selectedImageResourceId);
-            Log.d("AddExerciseDialog", "Selected Category ID: " + selectedCategoryId);
+            int selectedCategoryId = categorySpinner.getSelectedItemPosition() + 1;
 
             if (!exerciseName.isEmpty() && selectedImageResourceId != 0) {
-                dbHelper.addExercise(exerciseName, selectedCategoryId, selectedImageResourceId);
+                // Проверяем, редактируем ли мы существующее упражнение
+                if (exercise != null) {
+                    dbHelper.addExercise(exerciseName, selectedCategoryId, selectedImageResourceId, exercise.getId()); // Передаем ID упражнения
+                } else {
+                    dbHelper.addExercise(exerciseName, selectedCategoryId, selectedImageResourceId, 0); // Новый ID для нового упражнения
+                }
                 dialog.dismiss();
             } else {
                 Toast.makeText(context, "Введите название упражнения и выберите изображение", Toast.LENGTH_SHORT).show();
@@ -56,7 +58,18 @@ public class AddExerciseDialog {
         });
 
 
+
         exerciseImageView.setOnClickListener(v -> openImageSelectionDialog(context));
+    }
+
+    // Конструктор для редактирования существующего упражнения
+    public AddExerciseDialog(Context context, Exercise exercise) {
+        this(context); // Вызов существующего конструктора
+        this.exercise = exercise; // Сохраняем ссылку на упражнение
+        exerciseNameEditText.setText(exercise.getName());
+        exerciseImageView.setImageResource(exercise.getIconResourceId());
+        // Установите выбранное изображение и категорию, если нужно
+        this.selectedImageResourceId = exercise.getIconResourceId(); // Сохраняем выбранный ID
     }
 
     private void openImageSelectionDialog(Context context) {
@@ -77,5 +90,3 @@ public class AddExerciseDialog {
         dialog.show();
     }
 }
-
-

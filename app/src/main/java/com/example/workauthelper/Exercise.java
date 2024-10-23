@@ -3,10 +3,12 @@ package com.example.workauthelper;
 public class Exercise {
     private String name;
     private int iconResourceId;
+    private int id; // Добавьте поле ID
 
-    public Exercise(String name, int iconResourceId) {
+    public Exercise(String name, int iconResourceId, int id) {
         this.name = name;
         this.iconResourceId = iconResourceId;
+        this.id = id; // Сохраняем ID
     }
 
     public String getName() {
@@ -15,5 +17,9 @@ public class Exercise {
 
     public int getIconResourceId() {
         return iconResourceId;
+    }
+
+    public int getId() {
+        return id; // Метод для получения ID
     }
 }

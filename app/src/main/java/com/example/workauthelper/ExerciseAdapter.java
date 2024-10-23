@@ -19,9 +19,11 @@ import androidx.annotation.MenuRes;
 import java.util.List;
 
 public class ExerciseAdapter extends ArrayAdapter<Exercise> {
+    private List<Exercise> exercises;
 
     public ExerciseAdapter(@NonNull Context context, List<Exercise> exercises) {
         super(context, 0, exercises);
+        this.exercises = exercises;
     }
 
 
@@ -59,28 +61,31 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
         inflater.inflate(R.menu.exercise_popup_menu, popupMenu.getMenu()); // Убедитесь, что R.menu правильный
 
         popupMenu.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.edit_ex:
-                    editExercise(exercise);
-                    return true;
-                case R.id.delete_ex:
-                    deleteExercise(exercise);
-                    return true;
-                default:
-                    return false;
+            int id = item.getItemId();
+            if (id == R.id.edit_ex) {
+                editExercise(exercise);
+                return true;
+            } else if (id == R.id.delete_ex) {
+                deleteExercise(exercise);
+                return true;
             }
+            return false;
         });
+
 
         popupMenu.show();
     }
 
     private void editExercise(Exercise exercise) {
-        // Реализуйте логику редактирования упражнения
-        // Например, откройте диалог для редактирования
+        AddExerciseDialog dialog = new AddExerciseDialog(getContext(), exercise);
+        dialog.show();
     }
 
     private void deleteExercise(Exercise exercise) {
-        // Реализуйте логику удаления упражнения
-        // Например, удалите его из базы данных и обновите список
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        dbHelper.deleteExercise(exercise.getId()); // Передаем ID упражнения
+        exercises.remove(exercise); // Удаляем из списка
+        notifyDataSetChanged(); // Обновляем адаптер
     }
+
 }
