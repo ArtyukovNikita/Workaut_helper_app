@@ -145,6 +145,15 @@ public class MainActivity extends AppCompatActivity {
         // Настройка календаря
         setupCalendar();
 
+        // В методе onCreate класса MainActivity
+        ImageButton addButton = findViewById(R.id.btn_add);
+        addButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+            startActivityForResult(intent, 1); // Запускаем CategoryActivity для получения результата
+        });
+
+
+
     }
 
     private void updateHeaderWithCurrentDate() {

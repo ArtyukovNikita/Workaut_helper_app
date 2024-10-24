@@ -242,8 +242,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public int getCategoryIdByName(String categoryName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CATEGORIES,
+                new String[]{COLUMN_CATEGORY_ID},
+                COLUMN_CATEGORY_NAME + " = ?",
+                new String[]{categoryName},
+                null, null, null);
 
-
-
-
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(0);
+            cursor.close();
+            return id;
+        }
+        return -1; // Возвращаем -1, если категория не найдена
+    }
 }

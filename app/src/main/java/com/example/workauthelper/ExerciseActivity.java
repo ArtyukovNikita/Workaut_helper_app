@@ -46,6 +46,12 @@ public class ExerciseActivity extends AppCompatActivity {
         searchButton.setOnClickListener(v -> {
             // Код для поиска упражнений
         });
+        // Проверяем, открыта ли активность через btn_add
+        boolean isAddingExercise = getIntent().getBooleanExtra("isAddingExercise", false);
+        // Если открыта для добавления, активируем соответствующую логику
+        if (isAddingExercise) {
+            // Логика для добавления упражнения
+        }
     }
 
 
