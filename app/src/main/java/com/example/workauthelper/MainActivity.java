@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+
         // Проверяем, были ли уже загружены изображения
         SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         boolean imagesLoaded = preferences.getBoolean(KEY_IMAGES_LOADED, false);
@@ -145,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
         // Настройка календаря
         setupCalendar();
 
-        // В методе onCreate класса MainActivity
         ImageButton addButton = findViewById(R.id.btn_add);
         addButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CategoryActivity.class);

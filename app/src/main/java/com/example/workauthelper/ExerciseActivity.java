@@ -51,6 +51,8 @@ public class ExerciseActivity extends AppCompatActivity {
         // Если открыта для добавления, активируем соответствующую логику
         if (isAddingExercise) {
             // Логика для добавления упражнения
+        } else {
+            // Делаем функцию выбора упражнения недоступной
         }
     }
 
@@ -63,5 +65,4 @@ public class ExerciseActivity extends AppCompatActivity {
             exercises.addAll(dbExercises);
         }
     }
-
 }

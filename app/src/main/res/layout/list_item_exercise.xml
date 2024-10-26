@@ -13,13 +13,27 @@
         android:src="@drawable/ic_exercise"
         android:contentDescription="Иконка упражнения" />
 
-    <TextView
-        android:id="@+id/exercise_name"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingStart="16dp"
-        android:textSize="18sp" />
+        android:layout_weight="1"> <!-- Используем weight для равномерного распределения пространства -->
+
+        <TextView
+            android:id="@+id/exercise_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/select_exercise_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:contentDescription="Выбрать упражнение" />
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/popup_menu_button"
@@ -29,3 +43,4 @@
         android:contentDescription="Меню"
         android:background="?attr/selectableItemBackground" />
 </LinearLayout>
+

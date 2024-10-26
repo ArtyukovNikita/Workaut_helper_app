@@ -3,8 +3,9 @@ package com.example.workauthelper;
 public class Exercise {
     private String name;
     private int iconResourceId;
-    private int id; // Добавьте поле ID
+    private int id; // Поле ID
 
+    // Конструктор
     public Exercise(String name, int iconResourceId, int id) {
         this.name = name;
         this.iconResourceId = iconResourceId;

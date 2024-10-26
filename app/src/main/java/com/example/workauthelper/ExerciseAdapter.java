@@ -1,33 +1,30 @@
 package com.example.workauthelper;
 
-import com.example.workauthelper.R;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.MenuRes;
 
 import java.util.List;
 
 public class ExerciseAdapter extends ArrayAdapter<Exercise> {
-    private List<Exercise> exercises;
+    private List<Exercise> exerciseList;
 
-    public ExerciseAdapter(@NonNull Context context, List<Exercise> exercises) {
+    public ExerciseAdapter(Context context, List<Exercise> exercises) {
         super(context, 0, exercises);
-        this.exercises = exercises;
+        this.exerciseList = exercises;
     }
 
-
-    @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         // Получаем элемент данных для этой позиции
@@ -42,6 +39,7 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
         ImageView exerciseIcon = convertView.findViewById(R.id.exercise_icon);
         TextView exerciseName = convertView.findViewById(R.id.exercise_name);
         ImageButton popupMenuButton = convertView.findViewById(R.id.popup_menu_button);
+        Button selectButton = convertView.findViewById(R.id.select_exercise_button);
 
         // Устанавливаем данные в элементы
         exerciseName.setText(exercise.getName());
@@ -52,40 +50,19 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
             showPopupMenu(v, exercise); // Передаем представление и упражнение
         });
 
+        // Обработка нажатия на кнопку
+        selectButton.setOnClickListener(v -> {
+            // Логика выбора упражнения
+            // Здесь можно добавить нужные действия при выборе упражнения
+            // Например, можно добавить в тренировку или показать уведомление
+            Toast.makeText(getContext(), "Выбрано упражнение: " + exercise.getName(), Toast.LENGTH_SHORT).show();
+        });
+
         return convertView;
     }
 
     private void showPopupMenu(View view, Exercise exercise) {
-        PopupMenu popupMenu = new PopupMenu(getContext(), view);
-        MenuInflater inflater = popupMenu.getMenuInflater();
-        inflater.inflate(R.menu.exercise_popup_menu, popupMenu.getMenu()); // Убедитесь, что R.menu правильный
-
-        popupMenu.setOnMenuItemClickListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.edit_ex) {
-                editExercise(exercise);
-                return true;
-            } else if (id == R.id.delete_ex) {
-                deleteExercise(exercise);
-                return true;
-            }
-            return false;
-        });
-
-
-        popupMenu.show();
+        // Реализация всплывающего меню
+        // Например, используйте PopupMenu для отображения действий с упражнением
     }
-
-    private void editExercise(Exercise exercise) {
-        AddExerciseDialog dialog = new AddExerciseDialog(getContext(), exercise);
-        dialog.show();
-    }
-
-    private void deleteExercise(Exercise exercise) {
-        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.deleteExercise(exercise.getId()); // Передаем ID упражнения
-        exercises.remove(exercise); // Удаляем из списка
-        notifyDataSetChanged(); // Обновляем адаптер
-    }
-
 }

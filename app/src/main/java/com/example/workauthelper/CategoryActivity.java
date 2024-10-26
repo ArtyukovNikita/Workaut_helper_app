@@ -49,15 +49,18 @@ public class CategoryActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, categories);
         listView.setAdapter(adapter);
 
+        boolean isAddingExercise = getIntent().getBooleanExtra("isAddingExercise", false);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(CategoryActivity.this, ExerciseActivity.class);
-                intent.putExtra("category_id", categoryIds.get(position)); // Передаем правильный ID категории
-                intent.putExtra("category_name", categories.get(position));
+                intent.putExtra("category_id", categoryIds.get(position)); // Передаем ID категории
+                intent.putExtra("isAddingExercise", isAddingExercise); // Передаем флаг
                 startActivity(intent);
             }
         });
+
 
         // Обработка нажатий на иконку добавления
         addButton.setOnClickListener(new View.OnClickListener() {
