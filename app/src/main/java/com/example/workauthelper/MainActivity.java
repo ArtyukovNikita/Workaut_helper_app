@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton calendarButton;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
-    private static final String PREFS_NAME = "MyPrefs";
-    private static final String KEY_IMAGES_LOADED = "images_loaded";
+    public static final String PREFS_NAME = "MyPrefs";
+    public static final String KEY_IMAGES_LOADED = "images_loaded";
     private View calendarLayout;
     private boolean isCalendarVisible = false;
     private Calendar currentCalendar;

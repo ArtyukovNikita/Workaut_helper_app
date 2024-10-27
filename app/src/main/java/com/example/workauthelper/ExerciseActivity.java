@@ -1,14 +1,20 @@
 package com.example.workauthelper;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ExerciseActivity extends AppCompatActivity {
 
@@ -54,6 +60,15 @@ public class ExerciseActivity extends AppCompatActivity {
         } else {
             // Делаем функцию выбора упражнения недоступной
         }
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Exercise selectedExercise = exercises.get(position);
+                addExerciseToWorkout(selectedExercise); // Добавляем упражнение в тренировку
+                Toast.makeText(ExerciseActivity.this, "Упражнение добавлено!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -64,5 +79,23 @@ public class ExerciseActivity extends AppCompatActivity {
         if (dbExercises != null) {
             exercises.addAll(dbExercises);
         }
+    }
+
+    public void addExerciseToWorkout(Exercise exercise) {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Проверяем, существует ли тренировка на текущую дату
+        long workoutId = dbHelper.getWorkoutIdByDate(currentDate);
+
+        if (workoutId == -1) {
+            // Тренировка не существует, создаем новую
+            workoutId = dbHelper.addWorkout(currentDate);
+        }
+
+        // Добавляем упражнение в тренировку
+        dbHelper.addExerciseToWorkout((int) workoutId, exercise.getId()); // Приводим к int
+
+
     }
 }
