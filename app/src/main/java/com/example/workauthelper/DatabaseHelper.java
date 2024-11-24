@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.annotation.SuppressLint;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,54 +19,53 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "fitness.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5; // Обновление версии базы данных
 
-    // Таблица категорий
+    // Имя таблицы категорий и ее столбцы
     private static final String TABLE_CATEGORIES = "categories";
     private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "category";
 
-    // Таблица упражнений
+    // Имя таблицы упражнений и ее столбцы
     private static final String TABLE_EXERCISES = "exercises";
     private static final String COLUMN_EXERCISE_ID = "id";
     private static final String COLUMN_EXERCISE_NAME = "exercise";
     private static final String COLUMN_EXERCISE_IMAGE = "image";
     private static final String COLUMN_EXERCISE_CATEGORY_ID = "category_id";
 
-    // Таблица тренировок
+    // Имя таблицы тренировок и ее столбцы
     private static final String TABLE_WORKOUTS = "workouts";
     private static final String COLUMN_WORKOUT_ID = "id";
     private static final String COLUMN_WORKOUT_DATE = "date";
 
-    // Таблица связи тренировок и упражнений
+    // Имя таблицы для связывания тренировок и упражнений
     private static final String TABLE_WORKOUT_EXERCISES = "workout_exercises";
     private static final String COLUMN_WORKOUT_EXERCISE_ID = "id";
     private static final String COLUMN_WORKOUT_EXERCISE_WORKOUT_ID = "workout_id";
     private static final String COLUMN_WORKOUT_EXERCISE_EXERCISE_ID = "exercise_id";
 
-    // Таблица подходов
+    // Имя таблицы для сетов и ее столбцы
     private static final String TABLE_SETS = "sets";
     private static final String COLUMN_SET_ID = "id";
     private static final String COLUMN_SET_WORKOUT_EXERCISE_ID = "workout_exercise_id";
     private static final String COLUMN_SET_WEIGHT = "weight";
     private static final String COLUMN_SET_REPS = "reps";
 
-    // Таблица векторных изображений
+    // Имя таблицы для векторных изображений и ее столбцы
     private static final String TABLE_VECTOR_IMAGES = "vector_images";
     private static final String COLUMN_IMAGE_ID = "id";
     private static final String COLUMN_IMAGE_PATH = "image_path";
     private static final String COLUMN_IMAGE_EXERCISE_ID = "exercise_id";
 
-    private Context context; // Добавьте это поле
+    private Context context;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.context = context; // Сохраните контекст
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         // Создание таблицы категорий
         String createCategoriesTable = "CREATE TABLE " + TABLE_CATEGORIES + " (" +
                 COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -88,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_WORKOUT_DATE + " TEXT NOT NULL);";
         db.execSQL(createWorkoutsTable);
 
-        // Создание таблицы связи тренировок и упражнений
+        // Создание таблицы для связывания тренировок и упражнений
         String createWorkoutExercisesTable = "CREATE TABLE " + TABLE_WORKOUT_EXERCISES + " (" +
                 COLUMN_WORKOUT_EXERCISE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_WORKOUT_EXERCISE_WORKOUT_ID + " INTEGER, " +
@@ -99,7 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 TABLE_EXERCISES + "(" + COLUMN_EXERCISE_ID + "));";
         db.execSQL(createWorkoutExercisesTable);
 
-        // Создание таблицы подходов
+        // Создание таблицы сетов
         String createSetsTable = "CREATE TABLE " + TABLE_SETS + " (" +
                 COLUMN_SET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_SET_WORKOUT_EXERCISE_ID + " INTEGER, " +
@@ -109,7 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 TABLE_WORKOUT_EXERCISES + "(" + COLUMN_WORKOUT_EXERCISE_ID + "));";
         db.execSQL(createSetsTable);
 
-        // Создание таблицы векторных изображений
+        // Создание таблицы для векторных изображений
         String createVectorImagesTable = "CREATE TABLE " + TABLE_VECTOR_IMAGES + " (" +
                 COLUMN_IMAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_IMAGE_PATH + " TEXT NOT NULL, " +
@@ -117,20 +117,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_IMAGE_EXERCISE_ID + ") REFERENCES " +
                 TABLE_EXERCISES + "(" + COLUMN_EXERCISE_ID + "));";
         db.execSQL(createVectorImagesTable);
-
-        //loadVectorImagesIntoDatabase(context);
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Удаление старых таблиц и создание новых при обновлении базы данных
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKOUT_EXERCISES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WORKOUTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VECTOR_IMAGES);
-        onCreate(db);
+        onCreate(db); // Создание новых таблиц
 
-        // Сбросьте значение в SharedPreferences
+        // Сброс флага загрузки изображений
         SharedPreferences preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         preferences.edit().putBoolean(KEY_IMAGES_LOADED, false).apply();
     }
@@ -186,7 +186,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close(); // Закрываем базу данных
     }
 
-
     public List<Integer> getAllVectorImages() {
         List<Integer> images = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -227,8 +226,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return categories;
     }
 
-
-
     public List<Exercise> getExercisesByCategory(int categoryId) {
         List<Exercise> exercises = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -253,7 +250,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return exercises;
     }
 
-
     public void addCategory(String categoryName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -261,6 +257,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_CATEGORIES, null, values);
         db.close();
     }
+
     public void addExercise(String exerciseName, int categoryId, int imageId, int exerciseId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -283,7 +280,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return rowsAffected > 0; // Возвращаем true, если удаление прошло успешно
     }
-
 
     public int getCategoryIdByName(String categoryName) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -314,18 +310,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             return id;
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
+        Log.d("DatabaseHelper", "Adding workout with date: " + date);
         return -1; // Если тренировка не найдена
     }
 
-
     public long addWorkout(String date) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_WORKOUT_DATE, date);
-        long id = db.insert(TABLE_WORKOUTS, null, values);
-        db.close();
-        return id; // Возвращаем ID новой тренировки
+
+        // Проверяем, существует ли уже тренировка с такой датой
+        String query = "SELECT * FROM " + TABLE_WORKOUTS + " WHERE " + COLUMN_WORKOUT_DATE + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{date});
+
+        if (cursor.getCount() == 0) {
+            // Если тренировки с такой датой нет, добавляем новую
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_WORKOUT_DATE, date);
+            long id = db.insert(TABLE_WORKOUTS, null, values);
+            cursor.close();
+            return id;
+        } else {
+            // Если тренировка с такой датой уже есть, возвращаем ее ID
+            cursor.moveToFirst();
+            @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(COLUMN_WORKOUT_ID));
+            cursor.close();
+            return id;
+        }
     }
 
     public void addExerciseToWorkout(int workoutId, int exerciseId) {
@@ -375,5 +387,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null; // Если упражнение не найдено
     }
 
+    public ArrayList<Exercise> getAllExercises() {
+        ArrayList<Exercise> exercises = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_EXERCISES, null, null, null, null, null, null);
 
+        if (cursor.moveToFirst()) {
+            do {
+                int idIndex = cursor.getColumnIndex(COLUMN_EXERCISE_ID);
+                int nameIndex = cursor.getColumnIndex(COLUMN_EXERCISE_NAME);
+                int imageIndex = cursor.getColumnIndex(COLUMN_EXERCISE_IMAGE);
+
+                if (idIndex != -1 && nameIndex != -1 && imageIndex != -1) {
+                    int id = cursor.getInt(idIndex);
+                    String name = cursor.getString(nameIndex);
+                    int image = cursor.getInt(imageIndex);
+                    exercises.add(new Exercise(name, image, id)); // Создаем объект Exercise и добавляем в список
+                } else {
+                    Log.e("DatabaseHelper", "Column index not found");
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return exercises;
+    }
 }

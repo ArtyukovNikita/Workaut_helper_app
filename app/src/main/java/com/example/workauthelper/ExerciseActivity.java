@@ -1,26 +1,24 @@
 package com.example.workauthelper;
 
+import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ExerciseActivity extends AppCompatActivity {
 
     private ListView listView;
     private ImageButton addButton;
-    private ImageButton searchButton;
     private ArrayList<Exercise> exercises;
     private ExerciseAdapter adapter;
 
@@ -29,73 +27,75 @@ public class ExerciseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise);
 
+        // Инициализация компонентов UI
         listView = findViewById(R.id.exercise_list_view);
-        TextView title = findViewById(R.id.activity_title);
         addButton = findViewById(R.id.add_button);
-        searchButton = findViewById(R.id.search_button);
+        TextView title = findViewById(R.id.activity_title);
 
-        // Получаем ID категории из интента
+        // Получаем идентификатор категории из Intent
         int categoryId = getIntent().getIntExtra("category_id", -1);
         String categoryName = getIntent().getStringExtra("category_name");
-        title.setText(categoryName);
+        title.setText(categoryName); // Устанавливаем заголовок активности
 
         exercises = new ArrayList<>();
-        loadExercisesFromDatabase(categoryId); // Загружаем упражнения для конкретной категории
+        loadExercisesFromDatabase(categoryId); // Загружаем упражнения из базы данных
         adapter = new ExerciseAdapter(this, exercises);
-        listView.setAdapter(adapter);
+        listView.setAdapter(adapter); // Устанавливаем адаптер для списка
 
+        // Обработка нажатия кнопки добавления упражнения
         addButton.setOnClickListener(v -> {
             AddExerciseDialog dialog = new AddExerciseDialog(ExerciseActivity.this);
             dialog.show();
         });
 
-        searchButton.setOnClickListener(v -> {
-            // Код для поиска упражнений
-        });
-        // Проверяем, открыта ли активность через btn_add
-        boolean isAddingExercise = getIntent().getBooleanExtra("isAddingExercise", false);
-        // Если открыта для добавления, активируем соответствующую логику
-        if (isAddingExercise) {
-            // Логика для добавления упражнения
-        } else {
-            // Делаем функцию выбора упражнения недоступной
-        }
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Exercise selectedExercise = exercises.get(position);
-                addExerciseToWorkout(selectedExercise); // Добавляем упражнение в тренировку
-                Toast.makeText(ExerciseActivity.this, "Упражнение добавлено!", Toast.LENGTH_SHORT).show();
-            }
+        // Обработка нажатия на элемент списка
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Exercise selectedExercise = exercises.get(position);
+            // Получаем выбранный workout_id из SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("WorkoutHelper", MODE_PRIVATE);
+            int workoutId = sharedPreferences.getInt("workout_id", -1); // Убедитесь, что вы сохраняете workout_id где-то
+            // Сохраняем выбранное упражнение в базе данных
+            addExerciseToWorkout(workoutId, selectedExercise.getId());
+            Toast.makeText(ExerciseActivity.this, "Упражнение добавлено!", Toast.LENGTH_SHORT).show(); // Уведомление об успешном добавлении
         });
     }
 
-
+    // Метод для загрузки упражнений из базы данных по категории
     private void loadExercisesFromDatabase(int categoryId) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        List<Exercise> dbExercises = dbHelper.getExercisesByCategory(categoryId); // Получаем упражнения по категории
+        List<Exercise> dbExercises = dbHelper.getExercisesByCategory(categoryId);
         exercises.clear();
         if (dbExercises != null) {
-            exercises.addAll(dbExercises);
+            exercises.addAll(dbExercises); // Добавляем загруженные упражнения в список
         }
     }
 
-    public void addExerciseToWorkout(Exercise exercise) {
+    // Метод для добавления упражнения в тренировку
+    public void addExerciseToWorkout(int workoutId, int exerciseId) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        SQLiteDatabase database = dbHelper.getWritableDatabase(); // Получаем объект базы данных
 
-        // Проверяем, существует ли тренировка на текущую дату
-        long workoutId = dbHelper.getWorkoutIdByDate(currentDate);
+        // Получаем сохраненную дату из SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("WorkoutHelper", MODE_PRIVATE);
+        String selectedDate = sharedPreferences.getString("selected_date", null); // Получаем выбранную дату
 
-        if (workoutId == -1) {
-            // Тренировка не существует, создаем новую
-            workoutId = dbHelper.addWorkout(currentDate);
+        // Проверяем, существует ли тренировка с этой датой
+        long newWorkoutId = dbHelper.getWorkoutIdByDate(selectedDate);
+
+        // Если тренировка не существует, создаем новую
+        if (newWorkoutId == -1) {
+            newWorkoutId = dbHelper.addWorkout(selectedDate); // Добавляем новую тренировку
         }
 
-        // Добавляем упражнение в тренировку
-        dbHelper.addExerciseToWorkout((int) workoutId, exercise.getId()); // Приводим к int
+        // Создание объекта ContentValues для вставки в базу данных
+        ContentValues values = new ContentValues();
+        values.put("workout_id", newWorkoutId); // Связываем с тренировкой
+        values.put("exercise_id", exerciseId); // Связываем с упражнением
 
+        // Вставка в базу данных
+        database.insert("workout_exercises", null, values);
 
+        // Закрытие базы данных
+        database.close();
     }
 }

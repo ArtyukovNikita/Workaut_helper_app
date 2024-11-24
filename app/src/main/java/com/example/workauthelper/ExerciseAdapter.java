@@ -1,6 +1,7 @@
 package com.example.workauthelper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -97,7 +98,16 @@ public class ExerciseAdapter extends ArrayAdapter<Exercise> {
 
     private void addExerciseToWorkout(Exercise exercise) {
         if (context instanceof ExerciseActivity) {
-            ((ExerciseActivity) context).addExerciseToWorkout(exercise);
+            // Получаем workoutId из SharedPreferences или передаем его как параметр
+            SharedPreferences sharedPreferences = context.getSharedPreferences("WorkoutHelper", Context.MODE_PRIVATE);
+            int workoutId = sharedPreferences.getInt("workout_id", -1); // Получаем сохраненный workout_id
+
+            // Проверяем, что workoutId валиден
+            if (workoutId != -1) {
+                ((ExerciseActivity) context).addExerciseToWorkout(workoutId, exercise.getId()); // Теперь передаем оба параметра
+            } else {
+                Toast.makeText(context, "Ошибка: тренировка не найдена", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
