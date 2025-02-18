@@ -5,5 +5,9 @@
     <string name="Today">Workout for today</string>
     <string name="navigation_drawer_open">Открыть меню</string>
     <string name="navigation_drawer_close">Закрыть меню</string>
+    <string name="previous_month">Предыдущий месяц</string>
+    <string name="next_month">Следующий месяц</string>
+    <string name="edit_ex">Редактировать</string>
+    <string name="delete_ex">Удалить</string>
 
 </resources>

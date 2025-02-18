@@ -5,58 +5,82 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton; // Импортируем ImageButton
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CategoryActivity extends AppCompatActivity {
 
     private ListView listView;
-    private String[] categories = {"Спина", "Ноги", "Грудь"};
-    private ImageButton addButton; // Добавляем ImageButton для добавления
-    private ImageButton searchButton; // Добавляем ImageButton для поиска
+    private ImageButton addButton;
+    private ArrayAdapter<String> adapter;
+    private List<String> categories; // Список категорий
+    private List<Integer> categoryIds; // Список ID категорий
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        // Инициализация элементов интерфейса
         listView = findViewById(R.id.category_list_view);
         TextView title = findViewById(R.id.activity_title);
-        addButton = findViewById(R.id.add_button); // Инициализируем ImageButton
-        searchButton = findViewById(R.id.search_button); // Инициализируем ImageButton
+        addButton = findViewById(R.id.add_button);
 
-        // Установка названия активности
         title.setText("Категории");
 
+        // Инициализация списков категорий и их ID
+        categories = new ArrayList<>();
+        categoryIds = new ArrayList<>();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+
+        // Получаем все категории из базы данных
+        List<String> allCategories = dbHelper.getAllCategories();
+        for (String category : allCategories) {
+            categories.add(category);
+            // Получаем ID категории и добавляем в список
+            categoryIds.add(getCategoryIdByName(category, dbHelper));
+        }
+
         // Установка адаптера для списка категорий
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, categories);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, categories);
         listView.setAdapter(adapter);
+
+        boolean isAddingExercise = getIntent().getBooleanExtra("isAddingExercise", false);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(CategoryActivity.this, ExerciseActivity.class);
-                intent.putExtra("category", categories[position]);
+                intent.putExtra("category_id", categoryIds.get(position)); // Передаем ID категории
+                intent.putExtra("isAddingExercise", isAddingExercise); // Передаем флаг
                 startActivity(intent);
             }
         });
 
-        // Обработка нажатий на иконки
+
+        // Обработка нажатий на иконку добавления
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Код для добавления новой категории
+                AddCategoryDialog dialog = new AddCategoryDialog(CategoryActivity.this);
+                dialog.setOnCategoryAddedListener(newCategory -> {
+                    categories.add(newCategory); // Добавляем новую категорию в список
+                    categoryIds.add(dbHelper.getCategoryIdByName(newCategory)); // Получаем ID новой категории
+                    adapter.notifyDataSetChanged(); // Обновляем адаптер
+                });
+                dialog.show(); // Показать диалог
             }
         });
+    }
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Код для поиска категории
-            }
-        });
+    // Метод для получения ID категории по имени
+    private int getCategoryIdByName(String categoryName, DatabaseHelper dbHelper) {
+        // Здесь должен быть код для получения ID по имени категории
+        // Например, запрос к базе данных
+        return dbHelper.getCategoryIdByName(categoryName);
     }
 }
